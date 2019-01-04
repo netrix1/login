@@ -113,6 +113,13 @@ if(!empty($retorno) && password_verify($senha, $retorno->senha)){
 if ($_SESSION['logado'] == 'SIM'){
 	//$retorno = array('codigo' => "1", 'mensagem' => 'Logado com sucesso!');
 	//echo json_encode($retorno);
+	$sql = 'INSERT INTO `tab_log_user_sucess` (`ip`, `login`, `origem`) VALUES (?, ?, ?)';
+
+	$stm = $conexao->prepare($sql);
+	$stm->bindValue(1, $_SERVER['REMOTE_ADDR']);
+	$stm->bindValue(2, $login);
+	$stm->bindValue(3, $_SERVER['HTTP_REFERER']);
+	$stm->execute();
 	echo "Consegiu Logar!!!";
 	exit();
 }else{
