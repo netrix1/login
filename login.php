@@ -57,7 +57,7 @@ if (empty($senha)){
 
 // Dica 3 - Verifica se o usuário já excedeu a quantidade de tentativas erradas do dia
 $sql = "SELECT count(*) AS tentativas, MINUTE(TIMEDIFF(NOW(), MAX(data_hora))) AS minutos ";
-$sql .= "FROM tab_log_tentativa WHERE ip = ? and DATE_FORMAT(data_hora,'%Y-%m-%d') = ? AND bloqueado = ?";
+$sql .= "FROM tab_userlogin_error WHERE ip = ? and DATE_FORMAT(data_hora,'%Y-%m-%d') = ? AND bloqueado = ?";
 $stm = $conexao->prepare($sql);
 $stm->bindValue(1, $_SERVER['REMOTE_ADDR']);
 $stm->bindValue(2, date('Y-m-d'));
@@ -98,7 +98,7 @@ if(!empty($retorno) && password_verify($senha, $retorno->senha)){
 	$bloqueado = ($_SESSION['tentativas'] == TENTATIVAS_ACEITAS) ? 'SIM' : 'NAO';
 
 	// Dica 6 - Grava a tentativa independente de falha ou não
-	$sql = 'INSERT INTO tab_log_tentativa (ip, email, senha, origem, bloqueado) VALUES (?, ?, ?, ?, ?)';
+	$sql = 'INSERT INTO tab_userlogin_error (ip, email, senha, origem, bloqueado) VALUES (?, ?, ?, ?, ?)';
 	$stm = $conexao->prepare($sql);
 	$stm->bindValue(1, $_SERVER['REMOTE_ADDR']);
 	$stm->bindValue(2, $login);
@@ -113,15 +113,18 @@ if(!empty($retorno) && password_verify($senha, $retorno->senha)){
 if ($_SESSION['logado'] == 'SIM'){
 	//$retorno = array('codigo' => "1", 'mensagem' => 'Logado com sucesso!');
 	//echo json_encode($retorno);
-	$sql = 'INSERT INTO `tab_log_user_sucess` (`ip`, `login`, `origem`) VALUES (?, ?, ?)';
+	$sql = 'INSERT INTO `tab_userlogin_sucess` (`ip`, `login`, `origem`) VALUES (?, ?, ?)';
 
 	$stm = $conexao->prepare($sql);
 	$stm->bindValue(1, $_SERVER['REMOTE_ADDR']);
 	$stm->bindValue(2, $login);
 	$stm->bindValue(3, $_SERVER['HTTP_REFERER']);
 	$stm->execute();
+	//	header('Location: /login/home.php');
+
+	var_dump($_SESSION);
 	echo "Consegiu Logar!!!";
-	exit();
+	//exit();
 }else{
 	if ($_SESSION['tentativas'] == TENTATIVAS_ACEITAS){
 		//$retorno = array('codigo' => "0", 'mensagem' => 'Você excedeu o limite de '.TENTATIVAS_ACEITAS.' tentativas, login bloqueado por '.MINUTOS_BLOQUEIO.' minutos!');
