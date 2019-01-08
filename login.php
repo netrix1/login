@@ -121,8 +121,9 @@ if ($_SESSION['logado'] == 'SIM'){
 	$stm->bindValue(3, $_SERVER['HTTP_REFERER']);
 	$stm->execute();
 	//	header('Location: /login/home.php');
-
+	echo "<pre>";
 	var_dump($_SESSION);
+	echo "</pre>";
 	echo "Consegiu Logar!!!";
 	//exit();
 }else{
